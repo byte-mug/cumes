@@ -2,10 +2,6 @@
 
 # CUMES - C Unrestricted Mail Exchange Server
 
-Other MTAs lack certain security 
-claiming other MTAs lacked certain security requirements and features
-
-and claiming that their new MTA OpenSMTPD will be a be the most security as much as possible. 
 
 * Under construction
 * Unrestricted: CUMES is not *Free, but with restrictions, Software*, but MIT-Licensed. You can do (almost) everything with the code.
