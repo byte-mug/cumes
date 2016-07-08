@@ -2,6 +2,7 @@
 
 # CUMES - C Unrestricted Mail Exchange Server
 
+CUMES is (or will be) a free and secure MTA, partially inspired by qmail.
 
 * Under construction
 * Unrestricted: CUMES is not *Free, but with restrictions, Software*, but MIT-Licensed. You can do (almost) everything with the code.

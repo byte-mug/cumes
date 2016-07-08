@@ -75,6 +75,7 @@ static void smtp_clear_preattribs(){
 	int i;
 	for(i=0;i<npre_attribs;++i)
 		sdsfree(pre_attribs[i].data);
+	npre_attribs = 0;
 }
 
 void smtp_connection(){
@@ -93,6 +94,7 @@ void smtp_connection(){
 			printf("500 Internal Server Error" LN);
 		}else if(csds_match(line,"HELO ","helo ")){
 			sdstrim(line," \r\n\t");
+			if(helo_host) sdsfree(helo_host);
 			helo_host = line;
 			line = NULL;
 			printf("250 Hello" LN);
@@ -100,18 +102,17 @@ void smtp_connection(){
 			preatttype = MAIL_FROM;
 			goto onOk;
 		}else if(csds_match(line,"RCPT TO:","rcpt to:")){
-			preatttype = MAIL_FROM;
+			preatttype = RCPT_TO;
 			goto onOk;
 		}else if(csds_match(line,"SEND FROM:","send from:")){
-			preatttype = MAIL_FROM;
+			preatttype = SEND_FROM;
 			goto onOk;
 		}else if(csds_match(line,"SOML FROM:","soml from:")){
-			preatttype = MAIL_FROM;
+			preatttype = SOML_FROM;
 			goto onOk;
 		}else if(csds_match(line,"SAML FROM:","saml from:")){
-			preatttype = MAIL_FROM;
+			preatttype = SAML_FROM;
 			goto onOk;
-		
 		}else if(csds_match(line,"DATA","data")){
 			printf("354 End data with <CR><LF>.<CR><LF>" LN);
 			// TODO: implement.
