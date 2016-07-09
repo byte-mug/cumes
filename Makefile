@@ -22,6 +22,8 @@ CFLAGS+=-O3 -I./include
 
 include lib/lib.mk
 
+include cumes-smtp/make.mk
+
 all: $(dist)
 	echo done
 

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 #include <str_match.h>
-
+#include <stdlib.h>
 
 int csds_match(sds subj,const char* pat1,const char* pat2){
 	size_t i,len = sdslen(subj);
