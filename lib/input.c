@@ -28,6 +28,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include <stdio.h>
+
 static char* buffer;
 static size_t max;
 static size_t curr;
@@ -38,9 +40,10 @@ static int status;
 
 enum {
 	STATUS_0N   = MATCH('\n',0),
+	STATUS_1N   = MATCH('\n',1),
 	STATUS_1DOT = MATCH( '.',1),
-	STATUS_2R   = MATCH('\r',1),
-	STATUS_2N   = MATCH('\n',1),
+	STATUS_2R   = MATCH('\r',2),
+	STATUS_2N   = MATCH('\n',2),
 };
 
 /*
@@ -107,7 +110,8 @@ IOV  input_readdot(){
 	/* matching \n.\n or \n.\r\n */
 	for(i=0;i<curr;++i){
 		switch(MATCH(buffer[i],status)){
-		case STATUS_0N: status = 1; break; /* '\n' */
+		case STATUS_0N:
+		case STATUS_1N: status = 1; break; /* '\n' */
 		case STATUS_1DOT: status = 2; break; /* '.' */
 		case STATUS_2R: status = 2; break; /* '\r' */
 		case STATUS_2N: /* '\n' */
