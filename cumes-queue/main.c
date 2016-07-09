@@ -19,8 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include <input.h>
+
 int qwp_main();
 
 int main(int argc,const char* const * argv){
+	input_init();
 	return qwp_main();
 }
