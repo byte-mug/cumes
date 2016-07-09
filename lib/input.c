@@ -93,6 +93,7 @@ IOV  input_readline(){
 	for(i=0;i<curr;++i){
 		if(buffer[i]=='\n'){
 			status = 0;
+			++i;
 			rpos = i;
 			return (IOV){buffer,i,0};
 		}
@@ -111,6 +112,7 @@ IOV  input_readdot(){
 		case STATUS_2R: status = 2; break; /* '\r' */
 		case STATUS_2N: /* '\n' */
 			status = 0; /* reset status */
+			++i;
 			rpos = i;
 			return (IOV){buffer,i,0};
 		default:
