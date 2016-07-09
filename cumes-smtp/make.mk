@@ -20,9 +20,9 @@
 
 cume_smtp+=lib/library.a
 
-cume-smtp: $(cume_smtp)
+bin/cumes-smtp: $(cume_smtp)
 	$(CC) $(LDFLAGS) $^ -o $@
 
-dist+=cume-smtp
+dist+=bin/cumes-smtp
 
 
