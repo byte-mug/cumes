@@ -21,6 +21,7 @@
  */
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -85,7 +86,7 @@ void queue_init() {
 	failon(path);
 	path = sdsMakeRoomFor(path,100);
 	failon(path);
-	if(!csds_end_with(path,'/')) {
+	if(!csds_ends_with(path,'/')) {
 		path = sdscat(path,"/");
 		failon(path);
 	}
@@ -116,7 +117,7 @@ void queue_envelope(sds envel[],int envelc) {
 	path = sdscatfmt(path,"todo/%I",MSGID); should(path);
 	MSGFD = open(path,O_CREAT|O_WRONLY,0600);
 	if(MSGFD<0) abort();
-	for(i=0;i<n;++i){
+	for(i=0;i<envelc;++i){
 		sdstrim(envel[i],"\r\n\t ");
 		if(writeAll(MSGFD,envel[i],sdslen(envel[i]))<0) abort();
 		if(write(MSGFD,"\n",1)<1) abort();

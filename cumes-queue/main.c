@@ -19,11 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
-#include <sds.h>
+int qwp_main();
 
-static inline int csds_ends_with(sds s,char e){
-	size_t ln = sdslen(s);
-	if(ln<1)return 0;
-	return s[ln-1]==e;
+int main(int argc,const char* const * argv){
+	return qwp_main();
 }

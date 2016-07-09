@@ -57,7 +57,7 @@ static int qwp_copydot(int dest) {
 		if(v.ptr) while(v.size){
 			n = write(dest,v.ptr,v.size);
 			if(n<1)return -1;
-			v.size-=n
+			v.size-=n;
 			v.ptr+=n;
 		}
 		if(v.more) continue;
