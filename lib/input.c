@@ -28,8 +28,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#include <stdio.h>
-
 static char* buffer;
 static size_t max;
 static size_t curr;
