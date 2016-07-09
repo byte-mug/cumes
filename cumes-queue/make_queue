@@ -1,0 +1,5 @@
+#!/bin/bash
+
+QUEUE=$1
+
+mkdir $QUEUE/{mess,intd,todo,info,local,remote,bounce}
