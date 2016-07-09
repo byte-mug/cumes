@@ -20,13 +20,16 @@
 
 CFLAGS+=-O3 -I./include
 
+all2: all
+	true
+
 include lib/lib.mk
 
 include cumes-smtp/make.mk
 include cumes-queue/make.mk
 
 all: $(dist)
-	echo done
+	true
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
