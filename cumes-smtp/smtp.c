@@ -33,22 +33,13 @@
 
 #define LN "\r\n"
 
-enum attrib_type{
-	MAIL_FROM,
-	RCPT_TO,
-	SEND_FROM,
-	SOML_FROM,
-	SAML_FROM,
-};
-struct pre_attrib {
-	enum attrib_type type;
-	sds data;
-};
+#define MAX_TOS 128
 
-#define MAX_PRE_ATTRIBS 128
+char pre_head_type;
+sds  pre_head;
 
-struct pre_attrib pre_attribs[MAX_PRE_ATTRIBS];
-int npre_attribs;
+sds pre_to[MAX_TOS];
+int npre_to;
 
 char hostbuf[10000];
 const char* hostname;
@@ -73,17 +64,18 @@ static sds smtp_readline() {
 }
 static void smtp_clear_preattribs(){
 	int i;
-	for(i=0;i<npre_attribs;++i)
-		sdsfree(pre_attribs[i].data);
-	npre_attribs = 0;
+	for(i=0;i<npre_to;++i)
+		sdsfree(pre_to[npre_to]);
+	npre_to = 0;
 }
 
 void smtp_connection(){
 	sds line = NULL;
-	enum attrib_type preatttype;
 	helo_host = NULL;
-	npre_attribs = 0;
-	ZERO(pre_attribs);
+	pre_head_type = 0;
+	pre_head = NULL;
+	npre_to = 0;
+	ZERO(pre_to);
 	if(gethostname(hostbuf,sizeof(hostbuf)-1)>=0) hostname = hostbuf;
 	else hostname = "localhost";
 	smtp_welcome();
@@ -99,20 +91,24 @@ void smtp_connection(){
 			line = NULL;
 			printf("250 Hello" LN);
 		}else if(csds_match(line,"MAIL FROM:","mail from:")){
-			preatttype = MAIL_FROM;
-			goto onOk;
-		}else if(csds_match(line,"RCPT TO:","rcpt to:")){
-			preatttype = RCPT_TO;
-			goto onOk;
+			pre_head_type = 'M';
+			goto checkFrom;
 		}else if(csds_match(line,"SEND FROM:","send from:")){
-			preatttype = SEND_FROM;
-			goto onOk;
+			pre_head_type = 'S';
+			goto checkFrom;
 		}else if(csds_match(line,"SOML FROM:","soml from:")){
-			preatttype = SOML_FROM;
-			goto onOk;
+			pre_head_type = 'O';
+			goto checkFrom;
 		}else if(csds_match(line,"SAML FROM:","saml from:")){
-			preatttype = SAML_FROM;
-			goto onOk;
+			pre_head_type = 'A';
+			goto checkFrom;
+		}else if(csds_match(line,"RCPT TO:","rcpt to:")){
+			if(npre_to >= MAX_TOS) goto onError;
+			sdstrim(line," \r\n\t");
+			pre_to[npre_to] = line;
+			npre_to++;
+			line = NULL;
+			printf("250 Ok" LN);
 		}else if(csds_match(line,"DATA","data")){
 			printf("354 End data with <CR><LF>.<CR><LF>" LN);
 			// TODO: implement.
@@ -129,11 +125,10 @@ void smtp_connection(){
 			printf("500 Command unrecognized" LN);
 		}
 		continue;
-		onOk:
-		if(npre_attribs >= MAX_PRE_ATTRIBS) goto onError;
+		checkFrom:
 		sdstrim(line," \r\n\t");
-		pre_attribs[npre_attribs] = (struct pre_attrib){preatttype,line};
-		npre_attribs++;
+		if(pre_head) sdsfree(pre_head);
+		pre_head = line;
 		line = NULL;
 		printf("250 Ok" LN);
 		continue;
