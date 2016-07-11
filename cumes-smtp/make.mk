@@ -18,7 +18,7 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-cume_smtp+=cumes-smtp/smtp.o cumes-smtp/main.o lib/library.a
+cume_smtp+=cumes-smtp/smtp.o cumes-smtp/queue.o cumes-smtp/main.o lib/library.a
 
 bin/cumes-smtp: $(cume_smtp)
 	$(CC) $(LDFLAGS) $^ -o $@

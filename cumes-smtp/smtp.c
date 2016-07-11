@@ -29,6 +29,8 @@
 #include <sds.h>
 #include <str_match.h>
 
+#include "smtp.h"
+
 #define ZERO(s) memset(&(s),0,sizeof(s));
 
 #define LN "\r\n"
@@ -68,6 +70,79 @@ static void smtp_clear_preattribs(){
 		sdsfree(pre_to[npre_to]);
 	npre_to = 0;
 }
+
+static int writeAll(int fd,const char* data,size_t len){
+	int n;
+	while(len){
+		n = write(fd,data,len);
+		if(n<1)return -1;
+		data+=n;
+		len-=n;
+	}
+	return 0;
+}
+
+static void smtp_handle_data(){
+	IOV v;
+	sds line = sdsempty();
+	int fd,i,not_broken;
+	const char prefix[2] = {pre_head_type,0};
+	if((!pre_head) || (npre_to<1)){
+		printf("503 Bad sequence of commands" LN);
+		sdsfree(line);
+		return;
+	}
+	fd = queue_open_sink();
+	if(fd<0) goto dataPreError;
+	line = sdscatfmt(line,"%s%S\n",prefix,pre_head);
+	if(!line) goto dataPreError;
+	if(writeAll(fd,line,sdslen(line))<0) goto dataPreError;
+	for(i=0;i<npre_to;++i){
+		sdssetlen(line,0); line[0]=0;
+		line = sdscatfmt(line,"+%S\n",pre_to[i]);
+		if(!line) goto dataPreError;
+		if(writeAll(fd,line,sdslen(line))<0) goto dataPreError;
+	}
+	if(writeAll(fd,";\n",2)<0) goto dataPreError;
+	sdsfree(line);
+	line = NULL;
+
+	/*
+	 * Start reading input.
+	 */
+	printf("354 End data with <CR><LF>.<CR><LF>" LN);
+	not_broken = 1;
+	v.more = 1;
+	while(v.more) {
+		v = input_readdot();
+		if(!v.ptr) continue;
+		if(not_broken)not_broken = writeAll(fd,v.ptr,v.size);
+	}
+	close(fd);
+	
+	/*
+	 * Respond to the client.
+	 */
+	if(not_broken) {
+		printf("250 Ok" LN);
+	}else{
+		/*
+		 * We are allowed to respond with one of the following status codes:
+		 * 552, 554, 451 or 452.
+		 * 
+		 * Hence we don't know, what exactly went wrong, we respond with
+		 * "554 Transaction failed"
+		 */
+		printf("554 Transaction failed" LN);
+	}
+	
+	return;
+dataPreError:
+	printf("451 Requested action aborted: error in processing" LN);
+	sdsfree(line);
+	return;
+}
+
 
 void smtp_connection(){
 	sds line = NULL;
@@ -110,8 +185,7 @@ void smtp_connection(){
 			line = NULL;
 			printf("250 Ok" LN);
 		}else if(csds_match(line,"DATA","data")){
-			printf("354 End data with <CR><LF>.<CR><LF>" LN);
-			// TODO: implement.
+			smtp_handle_data();
 		}else if(csds_match(line,"TURN","turn")){
 			printf("502 Command not implemented" LN);
 		}else if(csds_match(line,"NOOP","noop")){
