@@ -84,15 +84,15 @@ static void queue_process_init(const char* msgnam){
 	todo    = sdsnew(queue); failon(todo);
 	todo    = sdscatfmt(todo,"todo/%S",MID); failon(todo);
 	info    = sdsnew(queue); failon(info);
-	info    = sdscatfmt(todo,"info/%S",MID); failon(info);
+	info    = sdscatfmt(info,"info/%S",MID); failon(info);
 	local   = sdsnew(queue); failon(local);
-	local   = sdscatfmt(todo,"local/%S",MID); failon(local);
+	local   = sdscatfmt(local,"local/%S",MID); failon(local);
 	remote  = sdsnew(queue); failon(remote);
 	remote  = sdscatfmt(remote,"remote/%S",MID); failon(remote);
 	modmess = sdsnew(queue); failon(modmess);
-	modmess = sdscatfmt(remote,"modmess/%S",MID); failon(modmess);
+	modmess = sdscatfmt(modmess,"modmess/%S",MID); failon(modmess);
 	intd    = sdsnew(queue); failon(intd);
-	intd    = sdscatfmt(remote,"intd/%S",MID); failon(intd);
+	intd    = sdscatfmt(intd,"intd/%S",MID); failon(intd);
 	sdsfree(MID);
 }
 
@@ -111,7 +111,7 @@ static void queue_proc_recipient_add(sds rec){
 		f = F_remote;
 	}
 	if(!f)return;
-	fprintf(f,"DONE:Y %s\n",rec);
+	fprintf(f,"DONE:N %s\n",rec);
 }
 static void queue_pr_cleanup() {
 	if(F_local)fclose(F_local);
