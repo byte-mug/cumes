@@ -101,9 +101,9 @@ static int queue_proc_recipient_is_local(sds rec){
 	// TODO: implement
 }
 
-static void queue_proc_recipient_add(int is_local,const char* rec){
+static void queue_proc_recipient_add(sds rec){
 	FOBJ f;
-	if(is_local){
+	if(queue_proc_recipient_is_local(rec)){
 		if(!F_local) F_local = fopen(local,"w");
 		f = F_local;
 	}else{
@@ -113,9 +113,15 @@ static void queue_proc_recipient_add(int is_local,const char* rec){
 	if(!f)return;
 	fprintf(f,"DONE:Y %s\n",rec);
 }
+static void queue_pr_cleanup() {
+	if(F_local)fclose(F_local);
+	if(F_remote)fclose(F_remote);
+}
 
-#define breakon(x) if(!(x)) return 0;
-#define FUBREAK { sdsfree(linebuf); return 0; }
+#define breakon(x) if(!(x)) { queue_pr_cleanup(); return 0; }
+#define FRET(x) { queue_pr_cleanup(); sdsfree(linebuf); return (x); }
+#define FUBREAK FRET(0)
+
 
 static int queue_proc_todo(){
 	sds linebuf;
@@ -132,13 +138,13 @@ static int queue_proc_todo(){
 		if((*line)!='+') continue;
 		linebuf = sdscat(linebuf,line+1); breakon(linebuf);
 		sdstrim(linebuf," \r\n\t");
-		queue_proc_recipient_add(queue_proc_recipient_is_local(linebuf),linebuf);
+		queue_proc_recipient_add(linebuf);
 		sdssetlen(linebuf,0);
 	}
-	sdsfree(linebuf);
-	return 1;
+	FRET(1)
 }
 #undef FUBREAK
+#undef FRET
 #undef breakon
 
 void queue_process(const char* msgnam){
