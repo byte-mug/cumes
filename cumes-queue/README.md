@@ -25,3 +25,10 @@ SMTP | Wire Protocol
 `RCPT TO:` | `+`
 `DATA` | `;`
 
+## Environment variables:
+
+Variable | Meaning
+--- | --- 
+`QUEUE` | Directory of the Mail Queue
+
+
