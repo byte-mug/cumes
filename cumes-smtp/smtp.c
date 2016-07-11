@@ -116,7 +116,7 @@ static void smtp_handle_data(){
 	while(v.more) {
 		v = input_readdot();
 		if(!v.ptr) continue;
-		if(not_broken)not_broken = writeAll(fd,v.ptr,v.size);
+		if(not_broken)not_broken = writeAll(fd,v.ptr,v.size)==0;
 	}
 	close(fd);
 	
