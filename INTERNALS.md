@@ -9,7 +9,7 @@ In order to enable proper privilege separation, programs do not invoke each othe
 Here's the data flow in the cumes suite:
 
 ```
-cumes-smtp --- cumes-queue --- TODO
+cumes-smtp --- cumes-queue --- cumes-process --- [TODO]
 ```
 
 Every incoming e-mail is added to a central queue directory by `cumes-queue`.
@@ -21,6 +21,7 @@ Each message in the queue is identified by a unique number, let's say 457. The q
 File | Meaning
 --- | ---
 mess/457 | the message
+mangled/457 | the message after processing (eg. SpamAssassin)
 todo/457 | the envelope: where the message came from, where it's going
 intd/457 | the envelope, under construction by qmail-queue
 info/457 | the envelope sender address, after preprocessing
@@ -58,4 +59,16 @@ Finally `cumes-queue` creates a new link, `todo/457`, for `intd/457`, moving
 to S4. At that instant the message has been successfully queued, and
 `cumes-queue` leaves it for further handling.
 
+### 4. How queued messages are preprocessed
+
+Once a message has been queued, `cumes-process` must decide which recipients
+are local and which recipients are remote. It may also rewrite some
+recipient addresses.
+
+When `cumes-process` notices `todo/457`, it knows that message 457 is in S4. It
+removes `info/457`, `local/457`, and `remote/457` if they exist. Then it reads
+through `todo/457`. It creates `info/457`, possibly `local/457`, possibly
+`remote/457`, and possibly `modmess/457`. When it is done, it removes `intd/457`.
+The message is still in S4 at this point. Finally `cumes-process` removes `todo/457`,
+moving to S5. At that instant the message has been successfully preprocessed.
 
