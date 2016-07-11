@@ -21,7 +21,7 @@ Each message in the queue is identified by a unique number, let's say 457. The q
 File | Meaning
 --- | ---
 mess/457 | the message
-mangled/457 | the message after processing (eg. SpamAssassin)
+modmess/457 | the message after processing (eg. SpamAssassin)
 todo/457 | the envelope: where the message came from, where it's going
 intd/457 | the envelope, under construction by qmail-queue
 info/457 | the envelope sender address, after preprocessing
@@ -34,13 +34,13 @@ Here are all possible states for a message.
 * '-' means it does not exist;
 * '?' means it may or may not exist.
 
-_ | mess | intd | todo | info | local | remote | bounce | _
---- | --- | --- | --- | --- | --- | --- | --- | ---
-   S1. | - | - | - | - | - | - | -
-   S2. | + | - | - | - | - | - | -
-   S3. | + | + | - | - | - | - | -
-   S4. | + | ? | + | ? | ? | ? | - | (queued)
-   S5. | + | - | - | + | ? | ? | ? | (preprocessed)
+_ | mess | modmess | intd | todo | info | local | remote | bounce | _
+--- | --- | --- | --- | --- | --- | --- | --- | --- | ---
+   S1. | - | - | - | - | - | - | - | -
+   S2. | + | - | - | - | - | - | - | -
+   S3. | + | - | + | - | - | - | - | -
+   S4. | + | - | ? | + | ? | ? | ? | - | (queued)
+   S5. | + | ? | - | - | + | ? | ? | ? | (preprocessed)
 
 Guarantee: If mess/457 exists, it has inode number 457.
 
