@@ -18,25 +18,11 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-CFLAGS+=-O3 -I./include
+cumes_process+=cumes-process/main.o cumes-process/queue.o lib/library.a
 
-all2: all
-	true
+bin/cumes-process: $(cumes_process)
+	$(CC) $(LDFLAGS) $^ -o $@
 
-include lib/lib.mk
-
-include cumes-smtp/make.mk
-include cumes-queue/make.mk
-include cumes-process/make.mk
-
-all: $(dist)
-	true
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-lib/%.o: lib/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
+dist+=bin/cumes-process
 
 
