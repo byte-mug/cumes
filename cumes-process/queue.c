@@ -77,7 +77,7 @@ static void init_doms(){
 		if(i>0){
 			temp = sdsnewlen(domains,i); failon(temp);
 			sdstolower(temp);
-			arrdoms[narrdoms++] = sdsnewlen(domains,i);
+			arrdoms[narrdoms++] = temp;
 		}
 		domains+=i+1;
 	}
