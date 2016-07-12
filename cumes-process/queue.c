@@ -85,6 +85,11 @@ static void init_doms(){
 		}
 		domains+=i+1;
 	}
+	if(*domains&&narrdoms<MAX_DOMS){
+		temp = sdsnew(domains); failon(temp);
+		sdstolower(temp);
+		arrdoms[narrdoms++] = temp;
+	}
 }
 
 void queue_init() {

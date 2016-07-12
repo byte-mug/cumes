@@ -83,7 +83,7 @@ int csds_pattm(sds subj, const char* pattern,char action){
 	switch(action){
 	case '[':sdsrange(subj,i?i-1:i,-1);break;
 	case '(':sdsrange(subj,i,-1);break;
-	case ')':sdsrange(subj,0,i>2?i-2:0);break;
+	case ')':sdsrange(subj,0,i>1?i-2:0);break;
 	case ']':sdsrange(subj,0,i?i-1:0);break;
 	case '!':return 1;
 	case '^':return i+1;
