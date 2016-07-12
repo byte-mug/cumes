@@ -92,4 +92,13 @@ int csds_pattm(sds subj, const char* pattern,char action){
 	return 1;
 }
 
+int cstr_indexof(const char* pattern,char num){
+	int i;
+	for(i=0;pattern[i];i++){
+		if(pattern[i]==num)return i;
+		
+	}
+	return -1;
+}
+
 

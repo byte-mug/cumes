@@ -37,6 +37,10 @@
 
 typedef FILE* FOBJ;
 
+#define MAX_DOMS 128
+
+static sds arrdoms[MAX_DOMS];
+static int narrdoms;
 static const char* queue;
 static sds mess,todo,info,local,remote,modmess,intd;
 
@@ -61,6 +65,24 @@ static void init_buffer(){
 	buflen = bsize;
 }
 
+static void init_doms(){
+	sds temp;
+	narrdoms = 0;
+	const char* domains = getenv("DOMAINS");
+	if(!domains)return;
+	int i;
+	while(narrdoms<MAX_DOMS){
+		i = cstr_indexof(domains,',');
+		if(i<0)break;
+		if(i>0){
+			temp = sdsnewlen(domains,i); failon(temp);
+			sdstolower(temp);
+			arrdoms[narrdoms++] = sdsnewlen(domains,i);
+		}
+		domains+=i+1;
+	}
+}
+
 void queue_init() {
 	size_t len;
 	sds queue2;
@@ -74,6 +96,7 @@ void queue_init() {
 	init_buffer();
 	F_local = NULL;
 	F_remote = NULL;
+	init_doms();
 }
 
 static void queue_process_init(const char* msgnam){
@@ -97,8 +120,23 @@ static void queue_process_init(const char* msgnam){
 }
 
 static int queue_proc_recipient_is_local(sds rec){
+	int i;
+	sds r2 = sdsdup(rec); failon(r2);
+
+	/*
+	 * Extract the Domain part of the mail address.
+	 */
+	csds_pattm(r2,"%u@",'(');
+	csds_pattm(r2,"%u>",')');
+	sdstolower(r2);
+	for(i=0;i<narrdoms;++i) {
+		if(!sdscmp(r2,arrdoms[i])) { /* the domain matches */
+			sdsfree(r2);
+			return 1;
+		}
+	}
+	sdsfree(r2);
 	return 0;
-	// TODO: implement
 }
 
 static void queue_proc_recipient_add(sds rec){

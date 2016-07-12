@@ -27,4 +27,6 @@ int csds_match(sds subj,const char* pat1,const char* pat2);
 
 int csds_pattm(sds subj, const char* pattern,char action);
 
+int cstr_indexof(const char* pattern,char num);
+
 
