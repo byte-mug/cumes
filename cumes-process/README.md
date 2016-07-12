@@ -5,4 +5,5 @@
 Variable | Meaning
 --- | --- 
 `QUEUE` | Directory of the Mail Queue
+`DOMAINS` | A comma seperated list of domains
 
