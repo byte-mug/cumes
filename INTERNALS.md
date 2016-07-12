@@ -9,7 +9,9 @@ In order to enable proper privilege separation, programs do not invoke each othe
 Here's the data flow in the cumes suite:
 
 ```
-cumes-smtp --- cumes-queue --- cumes-process --- [TODO]
+cumes-smtp --- cumes-queue --- cumes-process --- cumes-localsend
+                                             \
+                                              \_ cumes-remotesend
 ```
 
 Every incoming e-mail is added to a central queue directory by `cumes-queue`.
