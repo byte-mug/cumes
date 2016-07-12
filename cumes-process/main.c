@@ -27,7 +27,8 @@
 
 void queue_init();
 void queue_process(const char* msgnam);
-
+void clock_init(const char* progfile);
+void clock_loop();
 
 int main(int argc,const char* const* argv){
 	int c;
@@ -43,6 +44,9 @@ int main(int argc,const char* const* argv){
 		queue_process(message);
 		return 0;
 	}
+
+	clock_init(argv[0]);
+	clock_loop();
 	return 1;
 }
 

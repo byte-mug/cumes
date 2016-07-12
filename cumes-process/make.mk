@@ -18,7 +18,7 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-cumes_process+=cumes-process/main.o cumes-process/queue.o lib/library.a
+cumes_process+=cumes-process/main.o cumes-process/queue.o cumes-process/clockdir.o lib/library.a
 
 bin/cumes-process: $(cumes_process)
 	$(CC) $(LDFLAGS) $^ -o $@
