@@ -23,9 +23,10 @@
 #include <stdlib.h>
 
 int csds_match(sds subj,const char* pat1,const char* pat2){
-	size_t i,len = sdslen(subj);
+	size_t len = sdslen(subj);
+	int i;
 	if(pat2==NULL) pat2 = pat1;
-	for(i=0;i<len;++i,++pat1,++pat2){
+	for(i=0;(i<len)&&(i>=0);++i,++pat1,++pat2){
 		if(*pat1==0){
 			sdsrange(subj,i,-1);
 			return 1;
@@ -41,6 +42,53 @@ int csds_match(sds subj,const char* pat1,const char* pat2){
 
 	/* The entire string matched, so set string size to 0. */
 	sdssetlen(subj,0);
+	return 1;
+}
+
+int csds_pattm(sds subj, const char* pattern,char action){
+	int i=0;
+	size_t len = sdslen(subj);
+	char c;
+	#define ISDIE ((i>=len)||(i<0))
+	while(c = *pattern){
+		if(ISDIE) return 0;
+		switch(c){
+		case '%':
+			pattern++;
+			switch(*pattern){
+			case 'u':
+				pattern++;
+				c=*pattern;
+				while(c!=subj[i]){
+					i++;
+					if(ISDIE) return 0;
+				}
+				i++;
+				pattern++;
+				break;
+			default:
+				if((*pattern)!=subj[i]) return 0;
+				i++;
+				pattern++;
+			}
+			break;
+		default:
+			if(c!=subj[i]) return 0;
+			i++;
+			pattern++;
+		}
+	}
+	if(ISDIE)return 0;
+	#undef ISDIE
+	switch(action){
+	case '[':sdsrange(subj,i?i-1:i,-1);break;
+	case '(':sdsrange(subj,i,-1);break;
+	case ')':sdsrange(subj,0,i>2?i-2:0);break;
+	case ']':sdsrange(subj,0,i?i-1:0);break;
+	case '!':return 1;
+	case '^':return i+1;
+	default:return 0;
+	}
 	return 1;
 }
 
