@@ -26,6 +26,9 @@
 #include <unistd.h>
 #include <sys/file.h>
 #include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
 
 /* Our Library. */
 #include <sds.h>
@@ -41,6 +44,7 @@ typedef FILE* FOBJ;
 
 static sds arrdoms[MAX_DOMS];
 static int narrdoms;
+static const char* mailproc;
 static const char* queue;
 static sds mess,todo,info,local,remote,modmess,intd;
 
@@ -97,6 +101,7 @@ void queue_init() {
 	F_local = NULL;
 	F_remote = NULL;
 	init_doms();
+	mailproc = getenv("MAILPROC");
 }
 
 static void queue_process_init(const char* msgnam){
@@ -185,18 +190,50 @@ static int queue_proc_todo(){
 #undef FRET
 #undef breakon
 
+static void queue_mailproc(){
+	int fdin,fdout,status;
+	pid_t pid;
+	struct stat statbuf;
+
+	if(!mailproc)return;
+
+	fdin = open(mess,O_RDONLY,0); failfd(fdin,"open(mess)");
+
+	failfd(   fstat(fdin,&statbuf)     ,"fstat(mess)");
+
+	if(statbuf.st_size > (1<<19)) { close(fdin); return; }
+
+	fdout = open(modmess,O_WRONLY|O_CREAT|O_TRUNC,statbuf.st_mode); failfd(fdout,"open(modmess)");
+	pid = fork();
+	if(pid<0) abort();
+	if(pid==0){
+		dup2(fdin,0);
+		dup2(fdout,1);
+		close(fdin);
+		close(fdout);
+		execlp(mailproc,mailproc,NULL);
+		abort();
+	}
+	close(fdin);
+	close(fdout);
+	if(waitpid(pid,&status,0)<1) abort();
+	if(status) abort();
+}
+
 void queue_process(const char* msgnam){
 	int Locker;
 	queue_process_init(msgnam);
 	Locker = open(mess,O_RDONLY|O_CLOEXEC,0); failfd(Locker,"open(mess)");
 	if(flock(Locker,LOCK_EX)<0) abort();
+	F_todo = fopen(todo,"r"); failon(F_todo);
 	unlink(info);
 	unlink(local);
 	unlink(remote);
 	unlink(modmess);
-	F_todo = fopen(todo,"r"); failon(F_todo);
 	F_info = fopen(info,"w"); failon(F_info);
 	if(!queue_proc_todo()) abort();
+	fclose(F_todo);
+	queue_mailproc();
 	unlink(intd);
 	unlink(todo);
 }
