@@ -78,8 +78,8 @@ int csds_pattm(sds subj, const char* pattern,char action){
 			pattern++;
 		}
 	}
-	if(ISDIE)return 0;
 	#undef ISDIE
+	if(((i>len)||(i<0)))return 0;
 	switch(action){
 	case '[':sdsrange(subj,i?i-1:i,-1);break;
 	case '(':sdsrange(subj,i,-1);break;
