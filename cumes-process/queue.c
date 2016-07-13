@@ -35,6 +35,7 @@
 /* Our Library. */
 #include <sds.h>
 #include <str_hol.h>
+#include <str_match.h>
 
 #define failfd(x,expr) if((x)<0){ perror(expr); abort(); }
 
