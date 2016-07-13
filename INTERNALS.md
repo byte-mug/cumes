@@ -27,6 +27,7 @@ modmess/457 | the message after processing (eg. SpamAssassin)
 todo/457 | the envelope: where the message came from, where it's going
 intd/457 | the envelope, under construction by qmail-queue
 info/457 | the envelope sender address, after preprocessing
+info2/457 | link to info/457, serves as a trigger
 local/457 | local envelope recipient addresses, after preprocessing
 remote/457 | remote envelope recipient addresses, after preprocessing
 bounce/457 | permanent delivery errors
@@ -36,13 +37,14 @@ Here are all possible states for a message.
 * '-' means it does not exist;
 * '?' means it may or may not exist.
 
-_ | mess | modmess | intd | todo | info | local | remote | bounce | _
---- | --- | --- | --- | --- | --- | --- | --- | --- | ---
-   S1. | - | - | - | - | - | - | - | -
-   S2. | + | - | - | - | - | - | - | -
-   S3. | + | - | + | - | - | - | - | -
-   S4. | + | - | ? | + | ? | ? | ? | - | (queued)
-   S5. | + | ? | - | - | + | ? | ? | ? | (preprocessed)
+_ | mess | modmess | intd | todo | info | info2 | local | remote | bounce | _
+--- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
+   S1. | - | - | - | - | - | - | - | - | -
+   S2. | + | - | - | - | - | - | - | - | -
+   S3. | + | - | + | - | - | - | - | - | -
+   S4. | + | - | ? | + | ? | - | ? | ? | - | (queued)
+   S5. | + | ? | - | - | + | - | ? | ? | - 
+   S6. | + | ? | - | - | ? | + | ? | ? | ? | (preprocessed)
 
 Guarantee: If mess/457 exists, it has inode number 457.
 
@@ -71,6 +73,8 @@ When `cumes-process` notices `todo/457`, it knows that message 457 is in S4. It
 removes `info/457`, `local/457`, and `remote/457` if they exist. Then it reads
 through `todo/457`. It creates `info/457`, possibly `local/457`, possibly
 `remote/457`, and possibly `modmess/457`. When it is done, it removes `intd/457`.
-The message is still in S4 at this point. Finally `cumes-process` removes `todo/457`,
-moving to S5. At that instant the message has been successfully preprocessed.
+The message is still in S4 at this point. Then, it removes `todo/457`,
+moving to S5. Finally `cumes-process` creates a new link `info2/457` for `info/457`, moving to S6.
+At that instant the message has been successfully preprocessed.
+
 

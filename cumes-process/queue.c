@@ -29,6 +29,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <time.h>
+#include <utime.h>
 
 /* Our Library. */
 #include <sds.h>
@@ -46,7 +48,7 @@ static sds arrdoms[MAX_DOMS];
 static int narrdoms;
 static const char* mailproc;
 static const char* queue;
-static sds mess,todo,info,local,remote,modmess,intd;
+static sds mess,todo,info,info2,local,remote,modmess,intd;
 
 static char* buffer;
 static size_t buflen;
@@ -56,6 +58,8 @@ static FOBJ
 	F_info,
 	F_local,
 	F_remote;
+
+static void ignore(int i){}
 
 static void init_buffer(){
 	size_t psize = getpagesize();
@@ -118,6 +122,8 @@ static void queue_process_init(const char* msgnam){
 	todo    = sdscatfmt(todo,"todo/%S",MID); failon(todo);
 	info    = sdsnew(queue); failon(info);
 	info    = sdscatfmt(info,"info/%S",MID); failon(info);
+	info2   = sdsnew(queue); failon(info2);
+	info2   = sdscatfmt(info2,"info2/%S",MID); failon(info2);
 	local   = sdsnew(queue); failon(local);
 	local   = sdscatfmt(local,"local/%S",MID); failon(local);
 	remote  = sdsnew(queue); failon(remote);
@@ -226,6 +232,7 @@ static void queue_mailproc(){
 }
 
 void queue_process(const char* msgnam){
+	struct utimbuf buf;
 	int Locker;
 	queue_process_init(msgnam);
 	Locker = open(mess,O_RDONLY|O_CLOEXEC,0); failfd(Locker,"open(mess)");
@@ -241,6 +248,9 @@ void queue_process(const char* msgnam){
 	queue_mailproc();
 	unlink(intd);
 	unlink(todo);
+	buf.actime = buf.modtime = time(NULL);
+	utime(info,&buf);
+	ignore(link(info,info2));
 }
 
 

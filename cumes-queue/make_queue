@@ -2,4 +2,4 @@
 
 QUEUE=$1
 
-mkdir $QUEUE/{pid,mess,intd,todo,info,local,remote,bounce,modmess}
+mkdir $QUEUE/{pid,mess,intd,todo,info,info2,local,remote,bounce,modmess}
