@@ -18,7 +18,8 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-cumes_localsend+=cumes-localsend/main.o cumes-localsend/clockdir.o lib/library.a
+cumes_localsend+=cumes-localsend/main.o cumes-localsend/clockdir.o cumes-localsend/lmtpc.o
+cumes_localsend+=cumes-localsend/connect.o lib/library.a
 
 bin/cumes-localsend: $(cumes_localsend)
 	$(CC) $(LDFLAGS) $^ -o $@

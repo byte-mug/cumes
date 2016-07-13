@@ -19,13 +19,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <signal.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
-#include <sds.h>
+static void ignore_signal(int i){}
 
-int csds_match(sds subj,const char* pat1,const char* pat2);
+static struct sockaddr* build_address(const char* name,socklen_t *al){
+	static struct sockaddr_un stun;
+	size_t siz = strlen(name)+1;
+	size_t asiz = sizeof(stun)-sizeof(stun.sun_path)+siz;
+	struct sockaddr_un *un;
+	if(asiz>sizeof(stun)) {
+		*al = asiz;
+		un = malloc(asiz);
+		if(!un)return NULL;
+	} else {
+		*al = sizeof(stun);
+		un = &stun;
+	}
+	un->sun_family = AF_UNIX;
+	memcpy(un->sun_path,name,siz);
+	return (struct sockaddr*)un;
+}
 
-int csds_pattm(sds subj, const char* pattern,char action);
+int lmtp_connect(){
+	/* The serving process should not die at a SIGPIPE-signal. */
+	signal(SIGPIPE,ignore_signal);
+	int epark;
+	socklen_t addrl;
+	const char* env = getenv("LMTP");
+	if(!env) { errno = ENOENT; return -1; }
+	struct sockaddr* addr = build_address(env,&addrl);
+	if(!addr)return -1;
+	int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+	if(fd<0) return -1;
+	if(connect(fd,addr,addrl)<0) { epark = errno; close(fd); errno = epark; return -1; }
+	return fd;	
+}
 
-int cstr_indexof(const char* pattern,char num);
 

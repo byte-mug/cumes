@@ -1,4 +1,4 @@
-# cumes-process: Mail preprocessor in the queue
+# cumes-localsend: Send mails to a local LMTP server
 
 Work in progress.
 

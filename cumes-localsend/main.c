@@ -25,8 +25,8 @@
 
 #define caseof(c,b) case c:b;break;
 
-void queue_init(){}
-void queue_process(const char* msgnam){}
+void lmtp_init();
+void lmtp_process(const char* msgnam);
 void clock_init(const char* progfile);
 void clock_loop();
 
@@ -35,13 +35,13 @@ int main(int argc,const char* const* argv){
 	const char* message = NULL;
 	while ( (c = getopt(argc,(char*const*)argv, "p:")) != -1) {
 		switch(c) {
-			/* -p $MSGID : preprocess message $MSGID */
+			/* -p $MSGID : send message $MSGID */
 			caseof('p',message = optarg)
 		}
 	}
 	if(message) {
-		queue_init();
-		queue_process(message);
+		lmtp_init();
+		lmtp_process(message);
 		return 0;
 	}
 
