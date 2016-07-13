@@ -239,8 +239,15 @@ sds sdscatfmt(sds s, char const *fmt, ...) __attribute__((deprecated("insecure, 
 #else
 sds sdscatfmt(sds s, char const *fmt, ...);
 #endif
+
 sds sdstrim(sds s, const char *cset);
+
+#ifdef __GNUC__
+void sdsrange(sds s, int start, int end) __attribute__((deprecated("insecure")));
+#else
 void sdsrange(sds s, int start, int end);
+#endif
+
 void sdsupdatelen(sds s);
 void sdsclear(sds s);
 int sdscmp(const sds s1, const sds s2);

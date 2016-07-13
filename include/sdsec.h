@@ -28,3 +28,17 @@
 sds csds_catfmt(sds s, char const *fmt, ...);
 #define sdscatfmt csds_catfmt
 
+/*
+ * removes 'num' bytes from the front of 's'.
+ */
+void csds_pullfront(sds s,size_t num);
+
+/*
+ * removes 'num' bytes from the back of 's'.
+ */
+void csds_pullback(sds s,size_t num);
+
+static inline void csds_setlen(sds s,size_t len){
+	sdssetlen(s,len);
+	s[len]=0;
+}

@@ -218,3 +218,19 @@ sds csds_catfmt(sds s, char const *fmt, ...) {
     return s;
 }
 
+void csds_pullfront(sds s,size_t num){
+	size_t len = sdslen(s);
+	if(len<num) num = len;
+	len-=num;
+	memmove(s, s+num, len+1);
+	sdssetlen(s,len);
+}
+
+void csds_pullback(sds s,size_t num){
+	size_t len = sdslen(s);
+	if(len<num) num = len;
+	len-=num;
+	sdssetlen(s,len);
+	s[len]=0;
+}
+

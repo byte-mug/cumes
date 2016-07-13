@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 #include <str_match.h>
+#include <sdsec.h>
 #include <stdlib.h>
 
 int csds_match(sds subj,const char* pat1,const char* pat2){
@@ -28,7 +29,7 @@ int csds_match(sds subj,const char* pat1,const char* pat2){
 	if(pat2==NULL) pat2 = pat1;
 	for(i=0;(i<len)&&(i>=0);++i,++pat1,++pat2){
 		if(*pat1==0){
-			sdsrange(subj,i,-1);
+			csds_pullfront(subj,i);
 			return 1;
 		}
 		if(
@@ -41,12 +42,12 @@ int csds_match(sds subj,const char* pat1,const char* pat2){
 	if(*pat1) return 0;
 
 	/* The entire string matched, so set string size to 0. */
-	sdssetlen(subj,0);
+	csds_setlen(subj,0);
 	return 1;
 }
 
 int csds_pattm(sds subj, const char* pattern,char action){
-	int i=0;
+	size_t i=0;
 	size_t len = sdslen(subj);
 	char c;
 	#define ISDIE ((i>=len)||(i<0))
@@ -81,10 +82,10 @@ int csds_pattm(sds subj, const char* pattern,char action){
 	#undef ISDIE
 	if(((i>len)||(i<0)))return 0;
 	switch(action){
-	case '[':sdsrange(subj,i?i-1:i,-1);break;
-	case '(':sdsrange(subj,i,-1);break;
-	case ')':sdsrange(subj,0,i>1?i-2:0);break;
-	case ']':sdsrange(subj,0,i?i-1:0);break;
+	case '[':csds_pullfront(subj,i?i-1:i);break;
+	case '(':csds_pullfront(subj,i);break;
+	case ')':csds_setlen(subj,i?i-1:0);break;
+	case ']':csds_setlen(subj,i);break;
 	case '!':return 1;
 	case '^':return i+1;
 	default:return 0;
@@ -96,7 +97,6 @@ int cstr_indexof(const char* pattern,char num){
 	int i;
 	for(i=0;pattern[i];i++){
 		if(pattern[i]==num)return i;
-		
 	}
 	return -1;
 }
