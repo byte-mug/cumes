@@ -170,6 +170,7 @@ sds csds_catfmt(sds s, char const *fmt, ...) {
     va_end(ap);
     f = fmt;
     s = sdsMakeRoomFor(s,addlen);
+    if(!s)return NULL;
     sdsinclen(s,addlen);
     while(*f) {
         switch(*f) {
