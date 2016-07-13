@@ -87,6 +87,7 @@ static void smtp_handle_data(){
 	sds line = sdsempty();
 	int fd,i,not_broken;
 	const char prefix[2] = {pre_head_type,0};
+	if(!line) goto dataPreError;
 	if((!pre_head) || (npre_to<1)){
 		printf("503 Bad sequence of commands" LN);
 		sdsfree(line);
