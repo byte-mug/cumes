@@ -86,7 +86,7 @@ static void clock_check(){
 		mesg = temp;
 		temp = sdscat(lcm,ent->d_name); if(!temp) continue;
 		lcm = temp;
-		if(stat(lcm,&buf)<0)continue;
+		if(stat(mesg,&buf)<0)continue;
 		if(!S_ISREG(buf.st_mode))continue;
 		if(mtime>=buf.st_mtime)continue;
 		/*
