@@ -18,7 +18,7 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-library+=lib/sds.o lib/input.o lib/str_match.o
+library+=lib/sds.o lib/sdsec.o lib/input.o lib/str_match.o
 
 lib/library.a: $(library)
 	ar rcs $@ $?

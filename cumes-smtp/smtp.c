@@ -26,7 +26,7 @@
 
 /* Our Library. */
 #include <input.h>
-#include <sds.h>
+#include <sdsec.h>
 #include <str_match.h>
 
 #include "smtp.h"

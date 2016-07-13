@@ -234,7 +234,11 @@ sds sdscatprintf(sds s, const char *fmt, ...)
 sds sdscatprintf(sds s, const char *fmt, ...);
 #endif
 
+#ifdef __GNUC__
+sds sdscatfmt(sds s, char const *fmt, ...) __attribute__((deprecated("insecure, use csds_catfmt instead")));
+#else
 sds sdscatfmt(sds s, char const *fmt, ...);
+#endif
 sds sdstrim(sds s, const char *cset);
 void sdsrange(sds s, int start, int end);
 void sdsupdatelen(sds s);

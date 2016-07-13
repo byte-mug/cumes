@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 /* Our Library. */
-#include <sds.h>
+#include <sdsec.h>
 #include <str_hol.h>
 
 static int MSGFD;

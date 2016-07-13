@@ -33,7 +33,7 @@
 #include <utime.h>
 
 /* Our Library. */
-#include <sds.h>
+#include <sdsec.h>
 #include <str_hol.h>
 #include <str_match.h>
 
