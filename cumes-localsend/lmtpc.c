@@ -70,6 +70,9 @@ static int writeAll(int fd,const char* data,size_t len){
 	return 0;
 }
 
+static inline void ignorep(void* x) {}
+static inline void ignore(int x) {}
+
 static void read_from(){
 	sds from;
 	ssize_t n;
@@ -188,7 +191,7 @@ static void transmit(){
 	in = fdopen(fd,"r"); failon(in);
 	
 	/* Read Input line */
-	fgets(lineBuffer,sizeof(lineBuffer)-1,in);
+	ignorep(fgets(lineBuffer,sizeof(lineBuffer)-1,in));
 	/* Assume the incoming line to be correct, for now... */
 	
 	failon(writeAll(fd,clientHelo,sdslen(clientHelo))>=0);
@@ -211,20 +214,20 @@ static void transmit(){
 	for(;;){
 		n = read(fdMsg,lineBuffer,sizeof(lineBuffer));
 		if(n<1)break;
-		write(fd,lineBuffer,n);
+		writeAll(fd,lineBuffer,n);
 	}
 	
 	for(j=0;j<ndests;++j){
 		CONSUME
 		if(memcmp("250",line,3)){
 			lseek(fdLocal,dests[j].off,SEEK_SET);
-			write(fdLocal,"Y",1);
+			ignore(write(fdLocal,"Y",1));
 		}
 	}
 	
 conn_error:
 	writeAll(fd,"QUIT\r\n",6);
-	read(fd,lineBuffer,sizeof(lineBuffer));
+	ignore(read(fd,lineBuffer,sizeof(lineBuffer)));
 	fclose(in);
 	close(fd);
 }
@@ -242,6 +245,6 @@ void lmtp_process(const char* msgnam){
 		failon(fdMsg>=0);
 	read_from();
 	read_tos();
-	
+	transmit();
 }
 
