@@ -106,7 +106,7 @@ static void read_tos(){
 	ndests = 0;
 	for(;;){
 		if(used<sizeof(lineBuffer)){
-			n = read(fdInfo,lineBuffer+used,sizeof(lineBuffer)-used);
+			n = read(fdLocal,lineBuffer+used,sizeof(lineBuffer)-used);
 			if(n>0)used+=n;
 		}
 		i = 0;
