@@ -21,8 +21,10 @@
  */
 #include <input.h>
 
+void smtp_connection();
 int main(int argc, const char * const * argv){
 	input_init();
+	smtp_connection();
 }
 
 

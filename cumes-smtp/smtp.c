@@ -187,12 +187,14 @@ void smtp_connection(){
 			printf("250 Ok" LN);
 		}else if(csds_match(line,"DATA","data")){
 			smtp_handle_data();
+			smtp_clear_preattribs();
 		}else if(csds_match(line,"TURN","turn")){
 			printf("502 Command not implemented" LN);
 		}else if(csds_match(line,"NOOP","noop")){
 			printf("250 Ok" LN);
 		}else if(csds_match(line,"RSET","rset")){
 			smtp_clear_preattribs();
+			printf("250 Ok" LN);
 		}else if(csds_match(line,"QUIT","quit")){
 			printf("221 Bye" LN);
 			return;
