@@ -197,6 +197,7 @@ void smtp_connection(){
 			printf("250 Ok" LN);
 		}else if(csds_match(line,"QUIT","quit")){
 			printf("221 Bye" LN);
+			if(line)sdsfree(line);
 			return;
 		}else{
 			printf("500 Command unrecognized" LN);
